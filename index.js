@@ -97,10 +97,20 @@ module.exports = async function (config) {
     }
   };
 
+  // nigow's edit: see https://github.com/vercel/pkg/issues/204#issuecomment-822015279 for reference
+  const isPkg = typeof process.pkg !== 'undefined'
+  const chromiumExecutablePath = (isPkg
+          ? puppeteer.executablePath().replace(
+              /^.*?\/node_modules\/puppeteer\/\.local-chromium/,
+              path.join(path.dirname(process.execPath), '.local-chromium')
+          )
+          : puppeteer.executablePath()
+  );
+
   const launchOptions = {
     dumpio: !config.quiet && !config.logToStdErr,
     headless: (config.headless !== undefined ? config.headless : true),
-    executablePath: config.executablePath,
+    executablePath: chromiumExecutablePath,
     args: config.launchArguments || []
   };
 
